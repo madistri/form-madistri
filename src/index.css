@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Glassmorphism Dark Theme */
+    --background: 217 35% 12%;
+    --foreground: 0 0% 98%;
+
+    --card: 217 35% 15%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 217 35% 15%;
+    --popover-foreground: 0 0% 98%;
+
+    /* Neon Cyan Primary */
+    --primary: 180 100% 50%;
+    --primary-foreground: 217 35% 12%;
+
+    /* Purple Accent */
+    --secondary: 270 70% 65%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 217 35% 20%;
+    --muted-foreground: 0 0% 70%;
+
+    /* Lilac Accent */
+    --accent: 270 70% 65%;
+    --accent-foreground: 0 0% 98%;
+
+    /* Success Green */
+    --success: 142 76% 55%;
+    --success-foreground: 217 35% 12%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 217 35% 25%;
+    --input: 217 35% 25%;
+    --ring: 180 100% 50%;
+
+    --radius: 1rem;
+
+    /* Glassmorphism Effects */
+    --glass-bg: 217 35% 15% / 0.15;
+    --glass-border: 0 0% 100% / 0.2;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(217, 35%, 12%), hsl(217, 35%, 25%));
+    --gradient-accent: linear-gradient(135deg, hsl(270, 70%, 65%), hsl(180, 100%, 50%));
+    --gradient-neon: linear-gradient(135deg, hsl(180, 100%, 50%), hsl(270, 70%, 65%));
+    
+    /* Shadows */
+    --shadow-glow: 0 0 40px hsl(180 100% 50% / 0.3);
+    --shadow-card: 0 8px 32px 0 hsl(0 0% 0% / 0.37);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-gradient-to-br from-[#141E30] to-[#243B55] text-foreground font-sans antialiased;
+    min-height: 100vh;
+  }
+
+  /* Glassmorphism utility classes */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  }
+
+  .glass-button {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  .glass-button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  }
+
+  .neon-text {
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  }
+
+  /* Smooth transitions */
+  * {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
