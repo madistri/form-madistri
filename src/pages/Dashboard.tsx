@@ -6,6 +6,7 @@ import { LogOut, PlusCircle, BarChart3, Settings } from "lucide-react";
 import { toast } from "sonner";
 import { CompanyDialog } from "@/components/CompanyDialog";
 import { SurveyDialog } from "@/components/SurveyDialog";
+import { CompanyManagement } from "@/components/CompanyManagement";
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -14,6 +15,7 @@ const Dashboard = () => {
   const [surveys, setSurveys] = useState<any[]>([]);
   const [companyDialogOpen, setCompanyDialogOpen] = useState(false);
   const [surveyDialogOpen, setSurveyDialogOpen] = useState(false);
+  const [editingCompany, setEditingCompany] = useState<any>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -80,6 +82,21 @@ const Dashboard = () => {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     toast.success("Logout realizado com sucesso!");
+  };
+
+  const handleEditCompany = (company: any) => {
+    setEditingCompany(company);
+    setCompanyDialogOpen(true);
+  };
+
+  const handleCompanyDialogClose = () => {
+    setCompanyDialogOpen(false);
+    setEditingCompany(null);
+  };
+
+  const handleCompanySuccess = () => {
+    fetchStats();
+    fetchSurveys();
   };
 
   if (loading) {
@@ -153,7 +170,10 @@ const Dashboard = () => {
             </p>
             <Button 
               className="w-full bg-gradient-to-r from-primary to-secondary h-11"
-              onClick={() => setCompanyDialogOpen(true)}
+              onClick={() => {
+                setEditingCompany(null);
+                setCompanyDialogOpen(true);
+              }}
             >
               <PlusCircle className="w-4 h-4 mr-2" />
               Nova Empresa
@@ -175,6 +195,12 @@ const Dashboard = () => {
           </div>
         </div>
 
+        {/* Company Management */}
+        <CompanyManagement 
+          onEditCompany={handleEditCompany}
+          onRefresh={handleCompanySuccess}
+        />
+
         {/* Surveys List */}
         {surveys.length > 0 && (
           <div className="glass-card rounded-xl sm:rounded-2xl p-4 sm:p-6">
@@ -191,15 +217,26 @@ const Dashboard = () => {
                       {survey.form_companies?.name}
                     </p>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => navigate(`/survey/${survey.id}`)}
-                    className="glass-button w-full sm:w-auto"
-                  >
-                    <Settings className="w-4 h-4 mr-2" />
-                    Gerenciar
-                  </Button>
+                  <div className="flex gap-2 w-full sm:w-auto">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate(`/analytics/${survey.id}`)}
+                      className="glass-button flex-1 sm:flex-none"
+                    >
+                      <BarChart3 className="w-4 h-4 mr-2" />
+                      Analisar
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate(`/survey/${survey.id}`)}
+                      className="glass-button flex-1 sm:flex-none"
+                    >
+                      <Settings className="w-4 h-4 mr-2" />
+                      Gerenciar
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -220,8 +257,9 @@ const Dashboard = () => {
 
       <CompanyDialog 
         open={companyDialogOpen} 
-        onOpenChange={setCompanyDialogOpen}
-        onSuccess={fetchStats}
+        onOpenChange={handleCompanyDialogClose}
+        onSuccess={handleCompanySuccess}
+        company={editingCompany}
       />
       
       <SurveyDialog 

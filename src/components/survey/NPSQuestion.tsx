@@ -20,8 +20,8 @@ const NPSQuestion = ({ value, onChange }: NPSQuestionProps) => {
             onClick={() => onChange(num.toString())}
             className={`aspect-square rounded-xl font-bold text-lg transition-all ${
               value === num.toString()
-                ? "bg-gradient-to-br from-primary to-secondary text-primary-foreground scale-110"
-                : "glass-button text-foreground hover:bg-white/10"
+                ? "bg-gradient-to-br from-primary to-secondary text-white scale-110"
+                : "glass-button text-black hover:bg-white/10"
             }`}
           >
             {num}
