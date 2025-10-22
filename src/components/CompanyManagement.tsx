@@ -20,15 +20,22 @@ interface Company {
 interface CompanyManagementProps {
   onEditCompany: (company: Company) => void;
   onRefresh: () => void;
+  refreshTrigger?: number;
 }
 
-export const CompanyManagement = ({ onEditCompany, onRefresh }: CompanyManagementProps) => {
+export const CompanyManagement = ({ onEditCompany, onRefresh, refreshTrigger }: CompanyManagementProps) => {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchCompanies();
   }, []);
+
+  useEffect(() => {
+    if (refreshTrigger) {
+      fetchCompanies();
+    }
+  }, [refreshTrigger]);
 
   const fetchCompanies = async () => {
     try {

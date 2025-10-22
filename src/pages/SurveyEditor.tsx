@@ -3,10 +3,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { QuestionDialog } from "@/components/QuestionDialog";
 import { toast } from "sonner";
-import { ArrowLeft, Plus, Edit, Trash2, Copy, ExternalLink } from "lucide-react";
+import { ArrowLeft, Plus, Edit, Trash2, Copy, ExternalLink, QrCode, Download } from "lucide-react";
 import { motion } from "framer-motion";
+import QRCode from "qrcode";
 
 export default function SurveyEditor() {
   const { surveyId } = useParams();
@@ -16,6 +18,7 @@ export default function SurveyEditor() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<any>(null);
+  const [qrCodeModalOpen, setQrCodeModalOpen] = useState(false);
 
   useEffect(() => {
     loadSurveyData();
@@ -78,6 +81,39 @@ export default function SurveyEditor() {
     window.open(link, "_blank");
   };
 
+  const generateSurveyURL = () => {
+    if (!survey?.form_companies?.slug) return "";
+    return `${window.location.origin}/empresa/${survey.form_companies.slug}`;
+  };
+
+  const downloadQRCode = async () => {
+    try {
+      const url = generateSurveyURL();
+      if (!url) return;
+
+      const qrCodeDataURL = await QRCode.toDataURL(url, {
+        width: 512,
+        margin: 2,
+        color: {
+          dark: "#000000",
+          light: "#FFFFFF",
+        },
+      });
+
+      const link = document.createElement("a");
+      link.href = qrCodeDataURL;
+      link.download = `qrcode-${survey?.title?.replace(/[^a-zA-Z0-9]/g, "-") || "pesquisa"}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success("QR Code baixado com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao gerar QR Code");
+      console.error(error);
+    }
+  };
+
   const getQuestionTypeLabel = (type: string) => {
     const types: Record<string, string> = {
       nps: "NPS (0-10)",
@@ -137,6 +173,10 @@ export default function SurveyEditor() {
             <Button onClick={copyLink} variant="outline" className="glass-button" size="sm">
               <Copy className="w-4 h-4 mr-2" />
               <span className="sm:inline">Copiar Link</span>
+            </Button>
+            <Button onClick={() => setQrCodeModalOpen(true)} variant="outline" className="glass-button" size="sm">
+              <QrCode className="w-4 h-4 mr-2" />
+              <span className="sm:inline">Ver QR Code</span>
             </Button>
             <Button onClick={openLink} variant="outline" className="glass-button" size="sm">
               <ExternalLink className="w-4 h-4 mr-2" />
@@ -262,6 +302,68 @@ export default function SurveyEditor() {
           </Card>
         </motion.div>
       </div>
+
+      {/* Modal de QR Code */}
+      <Dialog open={qrCodeModalOpen} onOpenChange={setQrCodeModalOpen}>
+        <DialogContent className="glass-card border-white/10 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl">QR Code da Pesquisa</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Informações da pesquisa */}
+            <div className="bg-primary/10 p-4 rounded-lg">
+              <h3 className="font-semibold mb-2">📋 {survey?.title}</h3>
+              <p className="text-sm text-muted-foreground mb-1">
+                <strong>Empresa:</strong> {survey?.form_companies?.name}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                <strong>URL:</strong> {generateSurveyURL()}
+              </p>
+            </div>
+
+            {/* QR Code */}
+            <div className="flex justify-center">
+              <div className="bg-white p-4 rounded-lg">
+                <img 
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(generateSurveyURL())}`}
+                  alt="QR Code da Pesquisa"
+                  className="w-48 h-48"
+                />
+              </div>
+            </div>
+
+            {/* Botões de ação */}
+            <div className="space-y-3">
+              <Button 
+                onClick={downloadQRCode}
+                className="w-full h-11 bg-gradient-to-r from-primary to-secondary"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Baixar QR Code
+              </Button>
+              
+              <Button 
+                onClick={() => {
+                  navigator.clipboard.writeText(generateSurveyURL());
+                  toast.success("URL copiada para a área de transferência!");
+                }}
+                variant="outline"
+                className="w-full h-11"
+              >
+                <Copy className="w-4 h-4 mr-2" />
+                Copiar URL da Pesquisa
+              </Button>
+            </div>
+
+            <div className="bg-primary/10 p-3 rounded-lg">
+              <p className="text-sm text-muted-foreground">
+                💡 Compartilhe o QR Code ou a URL com seus clientes para que eles possam responder à pesquisa
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <QuestionDialog
         open={dialogOpen}

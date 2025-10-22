@@ -16,6 +16,7 @@ const Dashboard = () => {
   const [companyDialogOpen, setCompanyDialogOpen] = useState(false);
   const [surveyDialogOpen, setSurveyDialogOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState<any>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,6 +31,7 @@ const Dashboard = () => {
       setUser(session.user);
       setLoading(false);
       fetchStats();
+      setupRealtimeSubscriptions();
     };
 
     checkAuth();
@@ -43,6 +45,71 @@ const Dashboard = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  const setupRealtimeSubscriptions = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Subscribe to companies changes
+    const companiesSubscription = supabase
+      .channel('companies-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'form_companies',
+          filter: `created_by=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('Company change detected:', payload);
+          fetchStats();
+          setRefreshTrigger(prev => prev + 1);
+        }
+      )
+      .subscribe();
+
+    // Subscribe to surveys changes
+    const surveysSubscription = supabase
+      .channel('surveys-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'form_surveys'
+        },
+        (payload) => {
+          console.log('Survey change detected:', payload);
+          fetchStats();
+        }
+      )
+      .subscribe();
+
+    // Subscribe to responses changes
+    const responsesSubscription = supabase
+      .channel('responses-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'form_responses'
+        },
+        (payload) => {
+          console.log('Response change detected:', payload);
+          fetchStats();
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscriptions on unmount
+    return () => {
+      companiesSubscription.unsubscribe();
+      surveysSubscription.unsubscribe();
+      responsesSubscription.unsubscribe();
+    };
+  };
 
   const fetchStats = async () => {
     try {
@@ -96,7 +163,7 @@ const Dashboard = () => {
 
   const handleCompanySuccess = () => {
     fetchStats();
-    fetchSurveys();
+    setRefreshTrigger(prev => prev + 1);
   };
 
   if (loading) {
@@ -199,6 +266,7 @@ const Dashboard = () => {
         <CompanyManagement 
           onEditCompany={handleEditCompany}
           onRefresh={handleCompanySuccess}
+          refreshTrigger={refreshTrigger}
         />
 
         {/* Surveys List */}

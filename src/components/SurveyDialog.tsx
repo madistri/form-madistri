@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,7 @@ interface SurveyDialogProps {
 }
 
 export const SurveyDialog = ({ open, onOpenChange, onSuccess }: SurveyDialogProps) => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [companies, setCompanies] = useState<any[]>([]);
   const [formData, setFormData] = useState({
@@ -54,23 +56,29 @@ export const SurveyDialog = ({ open, onOpenChange, onSuccess }: SurveyDialogProp
         return;
       }
 
-      const { error } = await supabase.from("form_surveys").insert({
+      const { data: surveyData, error } = await supabase.from("form_surveys").insert({
         title: formData.title,
         description: formData.description,
         company_id: formData.company_id,
         is_active: true,
-      });
+      }).select(`
+        id,
+        title,
+        description,
+        form_companies (
+          id,
+          name,
+          slug
+        )
+      `).single();
 
       if (error) throw error;
 
       toast.success("Pesquisa cadastrada com sucesso! A pergunta NPS padrão foi adicionada automaticamente.");
-      setFormData({
-        title: "",
-        description: "",
-        company_id: "",
-      });
       onOpenChange(false);
       onSuccess();
+      // Redirecionar automaticamente para a tela de adicionar perguntas
+      navigate(`/survey/${surveyData.id}`);
     } catch (error: any) {
       toast.error(error.message || "Erro ao cadastrar pesquisa");
     } finally {
@@ -78,75 +86,88 @@ export const SurveyDialog = ({ open, onOpenChange, onSuccess }: SurveyDialogProp
     }
   };
 
+
+
+  const handleClose = () => {
+    setFormData({
+      title: "",
+      description: "",
+      company_id: "",
+    });
+    onOpenChange(false);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="glass-card border-white/10 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl sm:text-2xl">Nova Pesquisa</DialogTitle>
+          <DialogTitle className="text-xl sm:text-2xl">
+            Nova Pesquisa
+          </DialogTitle>
           <DialogDescription className="text-sm">
-            Crie uma pesquisa de satisfação personalizada
+            Preencha os dados abaixo para criar uma nova pesquisa de satisfação
           </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="company">Empresa *</Label>
-            <Select
-              value={formData.company_id}
-              onValueChange={(value) => setFormData({ ...formData, company_id: value })}
-              required
-            >
-              <SelectTrigger id="company">
-                <SelectValue placeholder="Selecione uma empresa" />
-              </SelectTrigger>
-              <SelectContent>
-                {companies.map((company) => (
-                  <SelectItem key={company.id} value={company.id}>
-                    {company.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="company">Empresa *</Label>
+              <Select
+                value={formData.company_id}
+                onValueChange={(value) => setFormData({ ...formData, company_id: value })}
+                required
+              >
+                <SelectTrigger id="company">
+                  <SelectValue placeholder="Selecione uma empresa" />
+                </SelectTrigger>
+                <SelectContent>
+                  {companies.map((company) => (
+                    <SelectItem key={company.id} value={company.id}>
+                      {company.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="title">Título da Pesquisa *</Label>
-            <Input
-              id="title"
-              required
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="Ex: Pesquisa de Satisfação 2024"
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="title">Título da Pesquisa *</Label>
+              <Input
+                id="title"
+                required
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="Ex: Pesquisa de Satisfação 2024"
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="description">Descrição</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Descreva o objetivo da pesquisa..."
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Descrição</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Descreva o objetivo da pesquisa..."
+              />
+            </div>
 
-          <div className="bg-primary/10 p-3 rounded-lg">
-            <p className="text-sm text-muted-foreground">
-              💡 A pergunta NPS padrão será adicionada automaticamente
-            </p>
-          </div>
+            <div className="bg-primary/10 p-3 rounded-lg">
+              <p className="text-sm text-muted-foreground">
+                💡 A pergunta NPS padrão será adicionada automaticamente
+              </p>
+            </div>
 
-          <Button type="submit" className="w-full h-11" disabled={loading}>
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Cadastrando...
-              </>
-            ) : (
-              "Cadastrar Pesquisa"
-            )}
-          </Button>
-        </form>
+            <Button type="submit" className="w-full h-11" disabled={loading}>
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Cadastrando...
+                </>
+              ) : (
+                "Cadastrar Pesquisa"
+              )}
+            </Button>
+          </form>
       </DialogContent>
     </Dialog>
   );

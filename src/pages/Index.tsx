@@ -19,16 +19,20 @@ const Index = () => {
           transition={{ delay: 0.2, type: "spring" }}
           className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-primary to-secondary mb-4"
         >
-          <Sparkles className="w-12 h-12 text-primary-foreground" />
+          <img 
+            src="/favicon.ico" 
+            alt="MAForm Logo" 
+            className="w-16 h-16 object-contain"
+          />
         </motion.div>
 
         {/* Title */}
         <div className="space-y-4">
           <h1 className="text-5xl md:text-7xl font-bold neon-text">
-            Express Poll
+            MAForm
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground">
-            Sistema Inteligente de Pesquisa de Satisfação
+            Sistema de Pesquisa de Satisfação
           </p>
         </div>
 

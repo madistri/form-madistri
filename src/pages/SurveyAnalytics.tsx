@@ -59,8 +59,54 @@ const SurveyAnalytics = () => {
   useEffect(() => {
     if (surveyId) {
       fetchSurveyData();
+      setupRealtimeSubscriptions();
     }
   }, [surveyId]);
+
+  const setupRealtimeSubscriptions = () => {
+    if (!surveyId) return;
+
+    // Subscribe to responses changes for this survey
+    const responsesSubscription = supabase
+      .channel(`survey-responses-${surveyId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'form_responses',
+          filter: `survey_id=eq.${surveyId}`
+        },
+        (payload) => {
+          console.log('Response change detected:', payload);
+          fetchSurveyData(); // Refresh all data when responses change
+        }
+      )
+      .subscribe();
+
+    // Subscribe to answers changes
+    const answersSubscription = supabase
+      .channel(`survey-answers-${surveyId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'form_answers'
+        },
+        (payload) => {
+          console.log('Answer change detected:', payload);
+          fetchSurveyData(); // Refresh all data when answers change
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscriptions on unmount
+    return () => {
+      responsesSubscription.unsubscribe();
+      answersSubscription.unsubscribe();
+    };
+  };
 
   const fetchSurveyData = async () => {
     try {
