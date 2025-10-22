@@ -226,30 +226,20 @@ const Survey = () => {
     setSubmitting(true);
 
     try {
-      // Create response
-      const { data: responseData, error: responseError } = await supabase
-        .from("form_responses")
-        .insert({
-          survey_id: survey!.id,
-          respondent_identifier: null,
-        })
-        .select()
-        .single();
-
-      if (responseError) throw responseError;
-
-      // Create answers
+      // Prepare answers array for the RPC function
       const answersArray = Object.entries(answers).map(([questionId, value]) => ({
-        response_id: responseData.id,
         question_id: questionId,
         answer_value: value,
       }));
 
-      const { error: answersError } = await supabase
-        .from("form_answers")
-        .insert(answersArray);
+      // Use RPC function to submit response (bypasses RLS issues)
+      const { data: responseId, error } = await supabase
+        .rpc('submit_survey_response', {
+          p_survey_id: survey!.id,
+          p_answers: answersArray
+        });
 
-      if (answersError) throw answersError;
+      if (error) throw error;
 
       // Show confetti
       confetti({
