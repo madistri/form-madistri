@@ -1,73 +1,73 @@
-# Welcome to your Lovable project
+# MAForm - Sistema de Pesquisa de Satisfação
 
-## Project info
+## Sobre o Projeto
 
-**URL**: https://lovable.dev/projects/a4646875-b1e8-4d14-93fc-472afa762f0e
+O **MAForm** é um sistema inteligente de pesquisa de satisfação com análise NPS (Net Promoter Score) em tempo real. Desenvolvido para empresas que desejam coletar e analisar feedback de clientes de forma eficiente e moderna.
 
-## How can I edit this code?
+## Funcionalidades
 
-There are several ways of editing your application.
+- ✅ Criação de pesquisas personalizadas
+- ✅ Múltiplos tipos de perguntas (NPS, múltipla escolha, sim/não, estrelas, texto)
+- ✅ Dashboard de analytics em tempo real
+- ✅ Análise NPS automática
+- ✅ Nuvem de palavras dos comentários
+- ✅ Interface responsiva e moderna
 
-**Use Lovable**
+## Como executar o projeto
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/a4646875-b1e8-4d14-93fc-472afa762f0e) and start prompting.
+**Desenvolvimento Local**
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Para executar o projeto localmente, você precisa ter Node.js & npm instalados.
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-Follow these steps:
+Siga estes passos:
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Passo 1: Clone o repositório
+git clone <URL_DO_SEU_REPOSITORIO>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Passo 2: Navegue para o diretório do projeto
+cd form-madistri
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Passo 3: Instale as dependências
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Passo 4: Configure as variáveis de ambiente
+# Copie o arquivo .env.example para .env e configure suas credenciais do Supabase
+
+# Passo 5: Execute o servidor de desenvolvimento
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Tecnologias Utilizadas
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Este projeto foi construído com:
 
-**Use GitHub Codespaces**
+- **Vite** - Build tool e dev server
+- **TypeScript** - Tipagem estática
+- **React** - Biblioteca de interface
+- **shadcn/ui** - Componentes de UI
+- **Tailwind CSS** - Framework de CSS
+- **Supabase** - Backend as a Service (banco de dados, autenticação, storage)
+- **Recharts** - Biblioteca de gráficos
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Estrutura do Banco de Dados
 
-## What technologies are used for this project?
+O sistema utiliza as seguintes tabelas principais:
 
-This project is built with:
+- `form_companies` - Empresas cadastradas
+- `form_surveys` - Pesquisas criadas
+- `form_questions` - Perguntas das pesquisas
+- `form_responses` - Respostas dos usuários
+- `form_answers` - Valores das respostas
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Contribuição
 
-## How can I deploy this project?
+Para contribuir com o projeto:
 
-Simply open [Lovable](https://lovable.dev/projects/a4646875-b1e8-4d14-93fc-472afa762f0e) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+1. Faça um fork do repositório
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -am 'Adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request

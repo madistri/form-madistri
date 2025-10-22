@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Lock, Mail, Sparkles } from "lucide-react";
+import { Lock, Mail } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -69,9 +69,13 @@ const Login = () => {
               transition={{ delay: 0.2, type: "spring" }}
               className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary mx-auto mb-4"
             >
-              <Sparkles className="w-8 h-8 text-primary-foreground" />
+              <img 
+                src="/favicon.ico" 
+                alt="MAForm Logo" 
+                className="w-10 h-10 object-contain"
+              />
             </motion.div>
-            <h1 className="text-3xl font-bold neon-text">Express Poll</h1>
+            <h1 className="text-3xl font-bold neon-text">MAForm</h1>
             <p className="text-muted-foreground">Sistema de Pesquisa de Satisfação</p>
           </div>
 
