@@ -20,17 +20,20 @@ const NPSQuestion = ({ value, onChange }: NPSQuestionProps) => {
             onClick={() => onChange(num.toString())}
             className={`aspect-square rounded-xl font-bold text-lg transition-all ${
               value === num.toString()
-                ? "bg-gradient-to-br from-primary to-secondary text-white scale-110"
+                ? "text-white scale-110"
                 : "glass-button text-black hover:bg-white/10"
             }`}
+            style={
+              value === num.toString()
+                ? {
+                    background: `linear-gradient(to bottom right, var(--company-primary, #A855F7), var(--company-secondary, #EC4899))`,
+                  }
+                : {}
+            }
           >
             {num}
           </motion.button>
         ))}
-      </div>
-      <div className="flex justify-between text-sm text-muted-foreground px-2">
-        <span>Improvável</span>
-        <span>Muito provável</span>
       </div>
     </div>
   );

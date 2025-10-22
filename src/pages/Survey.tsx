@@ -186,6 +186,19 @@ const Survey = () => {
 
   const handleAnswer = (questionId: string, value: string) => {
     setAnswers((prev) => ({ ...prev, [questionId]: value }));
+    
+    // Auto-advance for non-text questions after a short delay
+    const currentQuestion = questions[currentQuestionIndex];
+    if (currentQuestion && currentQuestion.question_type !== 'text') {
+      setTimeout(() => {
+        // Check if we can advance (question is answered)
+        if (currentQuestionIndex < questions.length - 1) {
+          setCurrentQuestionIndex((prev) => prev + 1);
+        } else {
+          handleSubmit();
+        }
+      }, 800); // 800ms delay to show the selection
+    }
   };
 
   const handleNext = () => {
@@ -389,7 +402,7 @@ const Survey = () => {
                   <Button
                     onClick={handlePrevious}
                     variant="outline"
-                    className="flex-1 hover:opacity-90 font-semibold py-6 rounded-xl bg-white/50 border-white/30 text-slate-700 hover:bg-white/70"
+                    className="flex-1 hover:opacity-90 font-semibold py-6 rounded-xl bg-white/50 border-white/30 text-slate-700 hover:bg-white/70 hover:text-slate-700"
                   >
                     <ChevronLeft className="w-5 h-5 mr-2" />
                     Voltar
