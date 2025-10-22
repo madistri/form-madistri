@@ -197,7 +197,7 @@ const Survey = () => {
         } else {
           handleSubmit();
         }
-      }, 800); // 800ms delay to show the selection
+      }, 25); // 200ms delay to show the selection
     }
   };
 
